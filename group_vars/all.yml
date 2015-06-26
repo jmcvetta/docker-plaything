@@ -1,0 +1,19 @@
+# vim:ft=ansible:
+---
+
+# Admin users to create on all hosts
+genericusers_users:
+  - name: jmcvetta
+    ssh_keys:
+      - "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    shell: /bin/bash
+    system: yes
+    groups: [admin, staff]
+
+# Additional utility packagesto be installed by ANXS.utilities role
+utilities_extras:
+  - vim
+  - git
+
+aws_region: ap-southeast-1
+

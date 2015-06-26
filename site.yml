@@ -1,0 +1,37 @@
+---
+
+- name: Ensure basic setup
+  hosts: all
+  sudo: yes
+  pre_tasks:
+    - name: Ensure packages are updated
+      apt:
+        upgrade: dist
+        update_cache: true
+
+    - name: Check if restart is required
+      stat:
+        path: /var/run/reboot-required
+      register: r
+
+    - name: Reboot host
+      command: shutdown -r now "Ansible updates triggered"
+      async: 0
+      poll: 0
+      ignore_errors: true
+      when: r.stat.exists is defined and r.stat.exists
+
+    - name: Wait for server to come back
+      sudo: false
+      local_action: wait_for 
+      args:
+        host: "{{ inventory_hostname }}"
+        port: 22
+        delay: 1
+      when: r.stat.exists is defined and r.stat.exists
+
+  roles:
+    - ANXS.hostname
+    - ANXS.utilities
+    - ANXS.generic-users
+    - angstwad.docker_ubuntu
